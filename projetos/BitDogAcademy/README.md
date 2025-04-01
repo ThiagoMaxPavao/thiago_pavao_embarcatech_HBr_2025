@@ -13,7 +13,13 @@ BitDogAcademy é uma plataforma interativa desenvolvida no programa EmbarcaTech 
 - Bateria recarregável
 
 ## 💾 Como Compilar e Executar o Código
-Para compilar e executar o projeto, utilize o **VSCode** com a extensão para projetos **Pi Pico**. Carregue o projeto na extensão e envie o programa para o microcontrolador.
+
+1. Abra o projeto no VSCode, usando o ambiente com suporte ao SDK do Raspberry Pi Pico (CMake + compilador ARM);
+2. Compile o projeto normalmente (Ctrl+Shift+B no VSCode ou via terminal com cmake e make);
+3. Conecte sua BitDogLab via cabo USB e coloque a Pico no modo de boot (pressione o botão BOOTSEL e conecte o cabo);
+4. Copie o arquivo .uf2 gerado para a unidade de armazenamento que aparece (RPI-RP2);
+5. A Pico reiniciará automaticamente e começará a executar o código;
+6. Siga as instruções exibidas no display OLED e acesse a atividade desejada.
 
 🔗 Extensão do VSCode: [Raspberry Pi Pico SDK Extension](https://github.com/raspberrypi/pico-vscode)
 
