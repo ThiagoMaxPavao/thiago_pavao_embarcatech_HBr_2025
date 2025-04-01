@@ -31,6 +31,11 @@ Para compilar e executar o projeto, utilize o **VSCode** com a extensão para pr
 | 27 | ADC | Joystick - Y |
 
 ## 🖼️ Imagens e Vídeos
+
+- **Foto da atividade de divisão inteira em execução**:
+
+![Atividade](./docs/atividade.png)
+
 - **Vídeo de Apresentação**: [Assista aqui](https://www.youtube.com/watch?v=xHCL8hOfLEQ)
 
 ## 📈 Resultados
