@@ -14,6 +14,8 @@ Este repositório reúne os projetos desenvolvidos ao longo do curso de Sistemas
 
 Cada projeto tem sua própria pasta, contendo o código-fonte, documentação e recursos visuais.
 
-## Projetos
+## 📂 Lista de Projetos
 
-- [BitDogAcademy](./projetos/BitDogAcademy/): Projeto final da primeira fase do curso EmbarcaTech.
+| Projeto | Descrição |
+|---------|-----------|
+| [BitDogAcademy](./projetos/BitDogAcademy/) | Plataforma interativa para auxiliar no ensino fundamental, combinando hardware embarcado e visualizações dinâmicas para tornar o aprendizado mais envolvente. |
