@@ -24,6 +24,7 @@
 volatile int64_t button_A_last_edge_time = 0;
 volatile int64_t button_B_last_edge_time = 0;
 
+// Funções de callback de pressionamento de cada botão
 void process_button_A();
 void process_button_B();
 
@@ -63,6 +64,8 @@ void buttons_init() {
 
 ssd1306_t disp;
 
+// Atualiza display com a contagem de pressionamentos e o tempo restante
+// Se não houver mudança nos valores, não atualiza o display, apenas retorna
 void draw_display(int tempo_restante, int contagem_pressionamentos) {
     char buffer[20];
     static int tempo_restante_atual = -1;
@@ -99,6 +102,7 @@ volatile int contagem_pressionamentos = 0;
 int tempo_restante = 0;
 volatile int64_t tempo_ultima_atualizacao_tempo = 0;
 
+// Reset de contagem e tempo
 void process_button_A() {
     contagem_pressionamentos = 0;
     tempo_restante = 9;
@@ -106,6 +110,7 @@ void process_button_A() {
     tempo_ultima_atualizacao_tempo = to_ms_since_boot(get_absolute_time());
 }
 
+// Incrementa contagem de pressionamentos
 void process_button_B() {
     if(contando)
         contagem_pressionamentos++;
@@ -123,6 +128,7 @@ int main() {
     while (true) {
         int64_t now = to_ms_since_boot(get_absolute_time());
 
+        // Passagem de um segundo desde a ultima atualização no tempo restante
         if(now - tempo_ultima_atualizacao_tempo > 1000 && contando) {
             tempo_restante--;
             tempo_ultima_atualizacao_tempo = now;
