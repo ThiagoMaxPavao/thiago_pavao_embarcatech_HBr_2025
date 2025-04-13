@@ -16,7 +16,7 @@
 // --------------------------- Lógica de Debounce dos botões ---------------------------
 
 // Tempo para ignorar oscilações do sinal
-#define DEBOUNCE_TIME 50
+#define DEBOUNCE_TIME 1
 
 // Tempo da última borda detectada no sinal da porta.
 // Para que a borda seja considerada válida a diferença deve
@@ -24,13 +24,8 @@
 volatile int64_t button_A_last_edge_time = 0;
 volatile int64_t button_B_last_edge_time = 0;
 
-void process_button_A() {
-    printf("Button A pressed\n");
-}
-
-void process_button_B() {
-    printf("Button B pressed\n");
-}
+void process_button_A();
+void process_button_B();
 
 // Rotina de interrupção para os botões
 // Realiza debounce e chama a função de callback apenas na borda de descida (pressionamento do botão)
@@ -96,21 +91,49 @@ void draw_display(int tempo_restante, int contagem_pressionamentos) {
     ssd1306_show(&disp);
 }
 
-// --------------------------- Função principal ---------------------------
+// --------------------------- Lógica principal ---------------------------
+
+// Variáveis globais
+volatile bool contando = false; // False se está congelado, esperando pressionamento do botão A. True se está contando.
+volatile int contagem_pressionamentos = 0;
+int tempo_restante = 0;
+volatile int64_t tempo_ultima_atualizacao_tempo = 0;
+
+void process_button_A() {
+    contagem_pressionamentos = 0;
+    tempo_restante = 9;
+    contando = true;
+    tempo_ultima_atualizacao_tempo = to_ms_since_boot(get_absolute_time());
+}
+
+void process_button_B() {
+    if(contando)
+        contagem_pressionamentos++;
+}
 
 int main() {
+    // Inicializa periféricos
     stdio_init_all();
-
     buttons_init();
 
     disp.external_vcc = false;
     ssd1306_init(&disp, 128, 64, 0x3C, I2C_PORT, I2C_SDA, I2C_SCL);
 
-    int i = 0;
-
+    // Loop principal - controle do tempo restante e atualização dos displays
     while (true) {
-        draw_display(i, 94-i);
-        i++;
-        sleep_ms(1000);
+        int64_t now = to_ms_since_boot(get_absolute_time());
+
+        if(now - tempo_ultima_atualizacao_tempo > 1000 && contando) {
+            tempo_restante--;
+            tempo_ultima_atualizacao_tempo = now;
+
+            if(tempo_restante <= 0) {
+                contando = false;
+            }
+        }
+
+        draw_display(tempo_restante, contagem_pressionamentos);
+
+        sleep_ms(10);
     }
 }
