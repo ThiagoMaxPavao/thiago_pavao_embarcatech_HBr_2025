@@ -40,11 +40,11 @@ BitDogAcademy é uma plataforma interativa desenvolvida no programa EmbarcaTech 
 
 - **Foto da atividade de divisão inteira em execução**:
 
-![Atividade](./docs/atividade.png)
+![Atividade](./assets/atividade.png)
 
 - **Apresentação de Slide Único**:
 
-![Apresentação](./docs/apresentacao.jpg)
+![Apresentação](./assets/apresentacao.jpg)
 
 - **Vídeo de Apresentação**: [Assista aqui](https://www.youtube.com/watch?v=xHCL8hOfLEQ)
 
