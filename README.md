@@ -14,6 +14,12 @@ Este repositório reúne os projetos desenvolvidos ao longo do curso de Sistemas
 
 Cada projeto tem sua própria pasta, contendo o código-fonte, documentação e recursos visuais.
 
+## 📜 Licença
+
+Todos os projetos estão protegidos sobre a mesma licença:
+
+MIT License - MIT GPL-3.0.
+
 ## 📂 Lista de Projetos
 
 | Projeto | Descrição |
