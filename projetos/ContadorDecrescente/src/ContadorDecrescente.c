@@ -1,8 +1,19 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "ssd1306.h"
 
+// --------------------------- Pinagem ---------------------------
+
+// Botões A e B
 #define BUTTON_A_PIN 5
 #define BUTTON_B_PIN 6
+
+// I2C display OLED
+#define I2C_PORT i2c1
+#define I2C_SDA 14
+#define I2C_SCL 15
+
+// --------------------------- Lógica de Debounce dos botões ---------------------------
 
 // Tempo para ignorar oscilações do sinal
 #define DEBOUNCE_TIME 50
@@ -53,12 +64,53 @@ void buttons_init() {
     gpio_set_irq_enabled_with_callback(BUTTON_B_PIN, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true, &gpio_callback);
 }
 
+// --------------------------- Display OLED ---------------------------
+
+ssd1306_t disp;
+
+void draw_display(int tempo_restante, int contagem_pressionamentos) {
+    char buffer[20];
+    static int tempo_restante_atual = -1;
+    static int contagem_pressionamentos_atual = -1;
+
+    // Atualiza o display apenas se os valores mudaram
+    if (tempo_restante == tempo_restante_atual && contagem_pressionamentos == contagem_pressionamentos_atual) {
+        return;
+    }
+
+    // Atualiza os valores atuais
+    tempo_restante_atual = tempo_restante;
+    contagem_pressionamentos_atual = contagem_pressionamentos;
+
+    // Limpa o display e desenha os novos valores
+    ssd1306_clear(&disp);
+
+    ssd1306_draw_string_by_center(&disp, 64, 10, 2, "Contagem");
+
+    sprintf(buffer, "- %d -", contagem_pressionamentos);
+    ssd1306_draw_string_by_center(&disp, 64, 30, 2, buffer);
+
+    sprintf(buffer, "Tempo: %d", tempo_restante);
+    ssd1306_draw_string_by_center(&disp, 64, 55, 2, buffer);
+
+    ssd1306_show(&disp);
+}
+
+// --------------------------- Função principal ---------------------------
+
 int main() {
     stdio_init_all();
 
     buttons_init();
 
+    disp.external_vcc = false;
+    ssd1306_init(&disp, 128, 64, 0x3C, I2C_PORT, I2C_SDA, I2C_SCL);
+
+    int i = 0;
+
     while (true) {
+        draw_display(i, 94-i);
+        i++;
         sleep_ms(1000);
     }
 }
