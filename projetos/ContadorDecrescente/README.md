@@ -63,7 +63,7 @@ O desenvolvimento também envolveu o uso de técnicas de interrupção (para det
 
 ## 📂 Estrutura de Arquivos
 
-O código-fonte se encontra na pasta `_src_`, destacam-se os arquivos:
+O código-fonte se encontra na pasta `src`, destacam-se os arquivos:
 
 - `ContadorDecrescente.c`: Lógica principal, configuração dos botões e renderização no display;
 - `inc/ssd1306.c` e `inc/ssd1306.h`: Biblioteca para comunicação com o display OLED via I2C.
