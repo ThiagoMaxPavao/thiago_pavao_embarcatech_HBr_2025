@@ -49,7 +49,8 @@ pico_enable_stdio_usb(Joystick 1)
 # Add the standard library to the build
 target_link_libraries(Joystick
         pico_stdlib
-        hardware_i2c)
+        hardware_i2c
+        hardware_adc)
 
 # Add the standard include files to the build
 target_include_directories(Joystick PRIVATE
