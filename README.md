@@ -25,3 +25,4 @@ MIT License - MIT GPL-3.0.
 | Projeto | Descrição |
 |---------|-----------|
 | [BitDogAcademy](./projetos/BitDogAcademy/) | Plataforma interativa para auxiliar no ensino fundamental, combinando hardware embarcado e visualizações dinâmicas para tornar o aprendizado mais envolvente. |
+| [Contador Decrescente](./projetos/ContadorDecrescente/) | Minigame com botões físicos e display OLED, que desafia o usuário a clicar o máximo possível em 9 segundos, explorando interrupções, temporização e tratamento de bounce em sistemas embarcados. |
