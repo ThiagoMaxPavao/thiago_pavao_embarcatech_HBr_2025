@@ -38,10 +38,8 @@ O desenvolvimento também envolveu o uso de técnicas de interrupção (para det
 - **Foto do programa em execução:** Com 5 cliques registrados e 6 segundos restantes para o fim.
 
 ![Foto em execução](./assets/execucao.jpeg)
-[
-- **Vídeo do programa em execução:**
 
-<video src="assets/contador_demo.mp4" autoplay muted loop width="600"></video>
+- **Vídeo do programa em execução:** https://youtube.com/shorts/vwIlDl6DkXs?feature=share
 
 ## 🧠 Lógica de Funcionamento
 
