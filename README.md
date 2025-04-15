@@ -16,9 +16,9 @@ Cada projeto tem sua própria pasta, contendo o código-fonte, documentação e 
 
 ## 📜 Licença
 
-Todos os projetos estão protegidos sobre a mesma licença:
+Todos os projetos estão licenciados sob a mesma licença:
 
-MIT License - MIT GPL-3.0.
+GNU General Public License v3.0 (GPL-3.0)
 
 ## 📂 Lista de Projetos
 
