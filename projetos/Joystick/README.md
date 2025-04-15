@@ -33,9 +33,7 @@ Este projeto consiste em um sistema de leitura e exibição em tempo real das co
 
 ## 🖼️ Imagens e Vídeos
 
-- **Vídeo do programa em execução:**
-
-<video src="assets/joystick_demo.mp4" autoplay muted loop width="600"></video>
+- **Vídeo do programa em execução:** https://youtube.com/shorts/Gfij5uwhnuE
 
 ## 🧠 Lógica de Funcionamento
 
