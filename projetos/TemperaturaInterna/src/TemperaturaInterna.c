@@ -17,19 +17,12 @@
 
 ssd1306_t disp;
 
+// Desenha temperatura no centro do display com símbolo de graus Celsius
 void draw_temp(float celsius) {
     char buffer[32];
 
     ssd1306_clear(&disp);
     snprintf(buffer, sizeof(buffer), "%.2f\x7F""C", celsius);
-    
-    // Print buffer contents in hexadecimal
-    printf("Hex dump of buffer:\n");
-    for (size_t i = 0; i < sizeof(buffer); ++i) {
-        printf("%02X ", (unsigned char)buffer[i]);
-    }
-    printf("\n");
-    
     ssd1306_draw_string_by_center(&disp, 64, 32, 2, buffer);
     ssd1306_show(&disp);
 }
@@ -38,8 +31,8 @@ void draw_temp(float celsius) {
 
 // Função para converter o valor lido do ADC para temperatura em graus Celsius
 float adc_to_temperature(uint16_t adc_value) {
-    const float conversion_factor = 3.3f / (1 << 12);  // Conversão de 12 bits (0-4095) para 0-3.3V
-    float voltage = adc_value * conversion_factor;     // Converte o valor ADC para tensão
+    const float conversion_factor = 3.3f / (1 << 12);           // Conversão de 12 bits (0-4095) para 0-3.3V
+    float voltage = adc_value * conversion_factor;              // Converte o valor ADC para tensão
     float temperature = 27.0f - (voltage - 0.706f) / 0.001721f; // Equação fornecida para conversão
     return temperature;
 }
@@ -47,25 +40,23 @@ float adc_to_temperature(uint16_t adc_value) {
 // --------------------------- Lógica Principal ---------------------------
 
 int main() {
+    // Inicializa os periféricos
     stdio_init_all();
 
-    // Inicializa o módulo ADC do Raspberry Pi Pico
     adc_init();
 
     // Seleciona o canal 4 do ADC (sensor de temperatura interno)
-    adc_set_temp_sensor_enabled(true);  // Habilita o sensor de temperatura interno
+    adc_set_temp_sensor_enabled(true);          // Habilita o sensor de temperatura interno
     adc_select_input(ADC_TEMPERATURE_CHANNEL);  // Seleciona o canal do sensor de temperatura
 
     disp.external_vcc = false;
     ssd1306_init(&disp, 128, 64, 0x3C, I2C_PORT, I2C_SDA, I2C_SCL);
 
-    while (true) {
-        // Lê o valor do ADC no canal selecionado (sensor de temperatura)
-        uint16_t adc_value = adc_read();
+    // Loop principal Lê o canal selecionado do ADC, converte para celsius e exibe no display
 
-        // Converte o valor do ADC para temperatura em graus Celsius
+    while (true) {
+        uint16_t adc_value = adc_read();
         float temperature = adc_to_temperature(adc_value);
-        
         draw_temp(temperature);
 
         sleep_ms(1000);
