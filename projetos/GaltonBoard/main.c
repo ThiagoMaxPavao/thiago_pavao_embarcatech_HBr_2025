@@ -26,6 +26,38 @@ int get_random_direction(int chance) {
 
 // --------------------------- Display OLED ---------------------------
 
+void draw_board(ssd1306_t *disp, int scale, int n_lines) {
+    int x_offset = scale;
+    int y_offset = (disp->height - scale)/2;
+
+    for(int line = 0; line < n_lines; line++) {
+        int n_pins = line + 1;
+        for(int column = 0; column < n_pins; column++) {
+            int x = x_offset + 2*scale*line;
+            int y = y_offset - scale*line + 2*scale*column;
+            ssd1306_draw_square(disp, x, y, scale, scale);
+        }
+        n_pins++;
+    }
+    ssd1306_show(disp);
+}
+
+void draw_ball(ssd1306_t *disp, int scale, int x, int y) {
+    int y_offset = (disp->height - scale)/2;
+
+    ssd1306_draw_square(disp, x*scale, y*scale + y_offset, scale, scale);
+    ssd1306_show(disp);
+}
+
+void clear_ball(ssd1306_t *disp, int scale, int x, int y) {
+    int y_offset = (disp->height - scale)/2;
+
+    ssd1306_clear_square(disp, x*scale, y*scale + y_offset, scale, scale);
+    ssd1306_show(disp);
+}
+
+// --------------------------- Main ---------------------------
+
 ssd1306_t disp;
 
 int main() {
@@ -35,10 +67,18 @@ int main() {
     ssd1306_init(&disp, 128, 64, 0x3C, I2C_PORT, I2C_SDA, I2C_SCL);
 
     ssd1306_clear(&disp);
-    ssd1306_draw_pixel(&disp, 0,32);
-    ssd1306_show(&disp);
+    draw_board(&disp, 5, 5);
+
+    int x_ball = 0;
+    int y_ball = 0;
 
     while (true) {
-        sleep_ms(1000);
+        draw_ball(&disp, 5, x_ball, y_ball);
+        sleep_ms(200);
+        clear_ball(&disp, 5, x_ball, y_ball);
+        sleep_ms(300);
+
+        x_ball += 1;
+        if(x_ball % 2 == 1) y_ball += get_random_direction(50);
     }
 }
