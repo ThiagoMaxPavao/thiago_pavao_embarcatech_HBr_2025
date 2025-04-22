@@ -35,7 +35,10 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(GaltonBoard main.c )
+add_executable(GaltonBoard
+        main.c
+        inc/ssd1306.c
+)
 
 pico_set_program_name(GaltonBoard "GaltonBoard")
 pico_set_program_version(GaltonBoard "0.1")
@@ -46,11 +49,14 @@ pico_enable_stdio_usb(GaltonBoard 1)
 
 # Add the standard library to the build
 target_link_libraries(GaltonBoard
-        pico_stdlib)
+        pico_stdlib
+        hardware_i2c
+)
 
 # Add the standard include files to the build
 target_include_directories(GaltonBoard PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
+        ${CMAKE_CURRENT_LIST_DIR}/inc
 )
 
 # Add any user requested libraries
