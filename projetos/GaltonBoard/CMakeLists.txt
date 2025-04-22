@@ -50,6 +50,7 @@ pico_enable_stdio_usb(GaltonBoard 1)
 # Add the standard library to the build
 target_link_libraries(GaltonBoard
         pico_stdlib
+        pico_rand
         hardware_i2c
 )
 

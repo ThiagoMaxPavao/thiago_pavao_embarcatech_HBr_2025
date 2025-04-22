@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "pico/rand.h"
 #include "ssd1306.h"
 
 // --------------------------- Pinagem ---------------------------
@@ -8,6 +9,20 @@
 #define I2C_PORT i2c1
 #define I2C_SDA 14
 #define I2C_SCL 15
+
+// --------------------------- Random ---------------------------
+
+// chance from 0 to 100
+// returns +1 or -1, for the given chance of +1
+int get_random_direction(int chance) {
+    uint64_t randValue = get_rand_64();
+    uint8_t randChance = (randValue % 100);
+    if (randChance < chance) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
 
 // --------------------------- Display OLED ---------------------------
 
