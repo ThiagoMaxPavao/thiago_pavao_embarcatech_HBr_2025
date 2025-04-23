@@ -49,12 +49,12 @@ void clear_balls(ssd1306_t *disp, int scale) {
 int update_balls(int n_lines) {
     static bool start_occupied = false;
     static int start_occupied_tick_count = 0;
-    int exit_position = 0;
+    int exit_position = -1;
 
     if(balls_falling[0].x >= 2*n_lines) {
         ball_queued_count++;
         ball_falling_count--;
-        exit_position = balls_falling[0].y;
+        exit_position = (balls_falling[0].y + n_lines)/2;
         for(int i = 0; i < ball_falling_count; i++) {
             balls_falling[i] = balls_falling[i+1];
         }

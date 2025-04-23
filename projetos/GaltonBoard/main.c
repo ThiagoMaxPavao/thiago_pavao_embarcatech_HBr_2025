@@ -3,6 +3,7 @@
 #include "ssd1306.h"
 
 #include "ball.h"
+#include "histogram.h"
 
 // --------------------------- Pinagem ---------------------------
 
@@ -39,15 +40,27 @@ int main() {
     disp.external_vcc = false;
     ssd1306_init(&disp, 128, 64, 0x3C, I2C_PORT, I2C_SDA, I2C_SCL);
 
+    int scale = 4;
+    int n_lines = 7;
+
     ssd1306_clear(&disp);
-    draw_board(&disp, 5, 5);
+    draw_board(&disp, scale, n_lines);
+
+    init_histogram(n_lines+1);
 
     while (true) {
-        draw_balls(&disp, 5);
+        draw_balls(&disp, scale);
         sleep_ms(200);
-        clear_balls(&disp, 5);
+        clear_balls(&disp, scale);
 
-        int exit_position = update_balls(5);
+        for(int i = 0; i < n_updates; i++) {
+            int exit_position = update_balls(n_lines); // from 0 to n_lines, n_lines + 1 options
+    
+            if(exit_position != -1) {
+                add_to_histogram(exit_position);
+            }
+        }
 
+        draw_histogram(&disp);
     }
 }
