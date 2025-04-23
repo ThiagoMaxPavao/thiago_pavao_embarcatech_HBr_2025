@@ -38,6 +38,7 @@ pico_sdk_init()
 add_executable(GaltonBoard
         main.c
         inc/ssd1306.c
+        inc/ball.c
 )
 
 pico_set_program_name(GaltonBoard "GaltonBoard")
