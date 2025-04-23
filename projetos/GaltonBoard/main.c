@@ -42,6 +42,7 @@ int main() {
 
     int scale = 4;
     int n_lines = 7;
+    int n_updates = 1;
 
     ssd1306_clear(&disp);
     draw_board(&disp, scale, n_lines);
