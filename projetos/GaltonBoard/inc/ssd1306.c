@@ -60,7 +60,7 @@ inline static void ssd1306_write(ssd1306_t *p, uint8_t val) {
 
 void setupPins(i2c_inst_t *i2c_instance, uint gpio_sda, uint gpio_scl) {
     // display OLED
-    i2c_init(i2c_instance, 400000);
+    i2c_init(i2c_instance, 1000000);
     gpio_set_function(gpio_sda, GPIO_FUNC_I2C);
     gpio_set_function(gpio_scl, GPIO_FUNC_I2C);
     gpio_pull_up(gpio_sda);
