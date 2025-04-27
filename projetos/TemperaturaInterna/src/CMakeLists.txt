@@ -37,6 +37,7 @@ pico_sdk_init()
 
 add_executable(TemperaturaInterna
         app/main.c
+        app/convert_temperature.c
         inc/ssd1306.c)
 
 pico_set_program_name(TemperaturaInterna "TemperaturaInterna")

@@ -2,6 +2,7 @@
 #include "pico/stdlib.h"
 #include "ssd1306.h"
 #include "hardware/adc.h"
+#include "convert_temperature.h"
 
 // --------------------------- Pinagem ---------------------------
 
@@ -27,16 +28,6 @@ void draw_temp(float celsius) {
     ssd1306_show(&disp);
 }
 
-// --------------------------- Conversão de Temperatura ---------------------------
-
-// Função para converter o valor lido do ADC para temperatura em graus Celsius
-float adc_to_temperature(uint16_t adc_value) {
-    const float conversion_factor = 3.3f / (1 << 12);           // Conversão de 12 bits (0-4095) para 0-3.3V
-    float voltage = adc_value * conversion_factor;              // Converte o valor ADC para tensão
-    float temperature = 27.0f - (voltage - 0.706f) / 0.001721f; // Equação fornecida para conversão
-    return temperature;
-}
-
 // --------------------------- Lógica Principal ---------------------------
 
 int main() {
@@ -56,7 +47,7 @@ int main() {
 
     while (true) {
         uint16_t adc_value = adc_read();
-        float temperature = adc_to_temperature(adc_value);
+        float temperature = adc_to_celsius(adc_value);
         draw_temp(temperature);
 
         sleep_ms(1000);
