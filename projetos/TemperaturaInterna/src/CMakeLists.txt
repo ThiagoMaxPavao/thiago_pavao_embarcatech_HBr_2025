@@ -38,7 +38,9 @@ pico_sdk_init()
 add_executable(TemperaturaInterna
         app/main.c
         app/convert_temperature.c
-        inc/ssd1306.c)
+        inc/ssd1306.c
+        test/test.c
+        unity/unity.c)
 
 pico_set_program_name(TemperaturaInterna "TemperaturaInterna")
 pico_set_program_version(TemperaturaInterna "0.1")
@@ -58,6 +60,8 @@ target_include_directories(TemperaturaInterna PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/inc
         ${CMAKE_CURRENT_LIST_DIR}/app
+        ${CMAKE_CURRENT_LIST_DIR}/test
+        ${CMAKE_CURRENT_LIST_DIR}/unity
 )
 
 # Add any user requested libraries

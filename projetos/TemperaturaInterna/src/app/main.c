@@ -3,6 +3,7 @@
 #include "ssd1306.h"
 #include "hardware/adc.h"
 #include "convert_temperature.h"
+#include "test.h"
 
 // --------------------------- Pinagem ---------------------------
 
@@ -33,6 +34,14 @@ void draw_temp(float celsius) {
 int main() {
     // Inicializa os periféricos
     stdio_init_all();
+
+    // Realiza os testes unitários
+    if (run_all_tests() == 0) {
+        printf("Testes falharam!\n");
+        return 1;
+    } else {
+        printf("Todos os testes passaram!\n");
+    }
 
     adc_init();
 
