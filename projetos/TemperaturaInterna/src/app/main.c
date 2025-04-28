@@ -3,7 +3,6 @@
 #include "ssd1306.h"
 #include "hardware/adc.h"
 #include "convert_temperature.h"
-#include "test.h"
 
 // --------------------------- Pinagem ---------------------------
 
