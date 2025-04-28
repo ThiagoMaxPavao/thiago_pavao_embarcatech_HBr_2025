@@ -35,14 +35,6 @@ int main() {
     // Inicializa os periféricos
     stdio_init_all();
 
-    // Realiza os testes unitários
-    if (run_all_tests() == 0) {
-        printf("Testes falharam!\n");
-        return 1;
-    } else {
-        printf("Todos os testes passaram!\n");
-    }
-
     adc_init();
 
     // Seleciona o canal 4 do ADC (sensor de temperatura interno)
