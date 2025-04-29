@@ -35,11 +35,14 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
+# Get all .c files in app and hal folders
+file(GLOB APP_SOURCES "app/*.c")
+file(GLOB HAL_SOURCES "hal/*.c")
+
+# Add executable with the collected sources
 add_executable(GaltonBoard
-        main.c
-        inc/ssd1306.c
-        inc/ball.c
-        inc/histogram.c
+    ${APP_SOURCES}
+    ${HAL_SOURCES}
 )
 
 pico_set_program_name(GaltonBoard "GaltonBoard")
@@ -59,7 +62,7 @@ target_link_libraries(GaltonBoard
 # Add the standard include files to the build
 target_include_directories(GaltonBoard PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/inc
+        ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
 # Add any user requested libraries
