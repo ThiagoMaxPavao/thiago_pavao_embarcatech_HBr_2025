@@ -57,6 +57,7 @@ target_link_libraries(GaltonBoard
         pico_stdlib
         pico_rand
         hardware_i2c
+        hardware_adc
 )
 
 # Add the standard include files to the build
