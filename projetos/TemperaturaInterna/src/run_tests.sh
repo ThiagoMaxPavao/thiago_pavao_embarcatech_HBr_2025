@@ -21,7 +21,7 @@ make
 
 # Run the test executable if build was successful
 if [ -f "$EXECUTABLE" ]; then
-    echo "Running unit tests..."
+    printf "\nRunning unit tests...\n\n"
     ./"$EXECUTABLE"
 else
     echo "Build failed or executable not found: $EXECUTABLE"
