@@ -21,7 +21,7 @@ Durante os testes, foi observado que os valores de temperatura variam rapidament
 2. Compile o projeto (Ctrl+Shift+B no VSCode ou via terminal com `cmake` e `make`);
 3. Conecte a Raspberry Pi Pico via cabo USB, pressionando o botão **BOOTSEL** ao conectar, para ativar o modo de boot;
 4. Copie o arquivo `.uf2` gerado para a unidade de armazenamento "RPI-RP2" que aparecerá;
-5. A Pico reiniciará automaticamente e iniciará a execução do programa;
+5. A Pico reiniciará automaticamente e iniciará a execução do programa.
 
 🔗 Extensão recomendada para o VSCode: [Raspberry Pi Pico SDK Extension](https://github.com/raspberrypi/pico-vscode)
 

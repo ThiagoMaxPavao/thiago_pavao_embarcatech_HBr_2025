@@ -18,8 +18,7 @@ BitDogAcademy é uma plataforma interativa desenvolvida no programa EmbarcaTech 
 2. Compile o projeto normalmente (Ctrl+Shift+B no VSCode ou via terminal com cmake e make);
 3. Conecte sua BitDogLab via cabo USB e coloque a Pico no modo de boot (pressione o botão BOOTSEL e conecte o cabo);
 4. Copie o arquivo .uf2 gerado para a unidade de armazenamento que aparece (RPI-RP2);
-5. A Pico reiniciará automaticamente e começará a executar o código;
-6. Siga as instruções exibidas no display OLED e acesse a atividade desejada.
+5. A Pico reiniciará automaticamente e começará a executar o código.
 
 🔗 Extensão do VSCode: [Raspberry Pi Pico SDK Extension](https://github.com/raspberrypi/pico-vscode)
 
