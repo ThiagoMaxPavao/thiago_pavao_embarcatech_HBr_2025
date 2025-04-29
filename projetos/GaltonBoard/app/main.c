@@ -51,6 +51,9 @@ bool simulation_tick_callback(repeating_timer_t *rt) {
     draw_balls(&disp, scale);
     draw_histogram(&disp);
 
+    // update display
+    ssd1306_show(&disp);
+
     return true; // Keep the timer running
 }
 

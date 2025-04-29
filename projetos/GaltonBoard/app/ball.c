@@ -36,14 +36,12 @@ void draw_balls(ssd1306_t *disp, int scale) {
     for(int i = 0; i < ball_falling_count; i++) {
         draw_ball(disp, scale, balls_falling[i].x, balls_falling[i].y);
     }
-    ssd1306_show(disp);
 }
 
 void clear_balls(ssd1306_t *disp, int scale) {
     for(int i = 0; i < ball_falling_count; i++) {
         clear_ball(disp, scale, balls_falling[i].x, balls_falling[i].y);
     }
-    ssd1306_show(disp);
 }
 
 int update_balls(int n_lines) {
