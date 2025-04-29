@@ -30,9 +30,31 @@ void draw_board(ssd1306_t *disp, int scale, int n_lines) {
     ssd1306_show(disp);
 }
 
-// --------------------------- Main ---------------------------
+// --------------------------- Simulation Tick Callback ---------------------------
 
 ssd1306_t disp;
+int scale = 4;
+int n_lines = 7;
+int n_updates = 1;
+
+bool simulation_tick_callback(repeating_timer_t *rt) {
+    clear_balls(&disp, scale);
+
+    for (int i = 0; i < n_updates; i++) {
+        int exit_position = update_balls(n_lines); // from 0 to n_lines, n_lines + 1 options
+
+        if (exit_position != -1) {
+            add_to_histogram(exit_position);
+        }
+    }
+
+    draw_balls(&disp, scale);
+    draw_histogram(&disp);
+
+    return true; // Keep the timer running
+}
+
+// --------------------------- Main ---------------------------
 
 int main() {
     stdio_init_all();
@@ -40,28 +62,15 @@ int main() {
     disp.external_vcc = false;
     ssd1306_init(&disp, 128, 64, 0x3C, I2C_PORT, I2C_SDA, I2C_SCL);
 
-    int scale = 4;
-    int n_lines = 7;
-    int n_updates = 1;
-
     ssd1306_clear(&disp);
     draw_board(&disp, scale, n_lines);
 
-    init_histogram(n_lines+1);
+    init_histogram(n_lines + 1);
+
+    repeating_timer_t timer;
+    add_repeating_timer_ms(200, simulation_tick_callback, NULL, &timer);
 
     while (true) {
-        draw_balls(&disp, scale);
-        sleep_ms(200);
-        clear_balls(&disp, scale);
-
-        for(int i = 0; i < n_updates; i++) {
-            int exit_position = update_balls(n_lines); // from 0 to n_lines, n_lines + 1 options
-    
-            if(exit_position != -1) {
-                add_to_histogram(exit_position);
-            }
-        }
-
-        draw_histogram(&disp);
+        tight_loop_contents();
     }
 }
