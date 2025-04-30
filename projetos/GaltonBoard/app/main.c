@@ -6,6 +6,12 @@
 #include "ball.h"
 #include "histogram.h"
 
+// --------------------------- Configuração ---------------------------
+
+#define JOYSTICK_N_BINS 16
+#define JOYSTICK_EXTEND_THRESHOLD 0.9f
+#define JOYSTICK_RETRACT_THRESHOLD 0.8f
+
 // --------------------------- Pinagem ---------------------------
 
 // I2C display OLED
@@ -16,6 +22,9 @@
 // Joystick
 #define JOY_X_PIN 26
 #define JOY_Y_PIN 27
+
+// Buzzer
+#define BUZZER_PIN 21
 
 // --------------------------- Display OLED ---------------------------
 
@@ -62,11 +71,52 @@ bool simulation_tick_callback(repeating_timer_t *rt) {
     return true; // Keep the timer running
 }
 
+// --------------------------- Joystick logic ---------------------------
+
+float r, teta;
+bool extended = false;
+int current_bin = -1, last_bin = -1;
+
+int update_joystick() {
+    int update = 0;
+
+    joystick_get_RA(&r, &teta);
+
+    // Update extension state
+    if (r > JOYSTICK_EXTEND_THRESHOLD) {
+        extended = true;
+    } else if (r < JOYSTICK_RETRACT_THRESHOLD) {
+        extended = false;
+        last_bin = -1;
+    }
+
+    if (extended) {
+        if (teta < 0) teta += 2 * M_PI;
+
+        // Calculate bin index
+        current_bin = (int)(teta * JOYSTICK_N_BINS / (2 * M_PI)) % JOYSTICK_N_BINS;
+
+        if (last_bin != -1) {
+            int diff = (current_bin - last_bin + JOYSTICK_N_BINS) % JOYSTICK_N_BINS;
+
+            if(diff != 0) {
+                gpio_put(BUZZER_PIN, true);
+                sleep_ms(10);
+                gpio_put(BUZZER_PIN, false);
+            }
+
+            if (diff == 1) update = -1;
+            else if (diff == JOYSTICK_N_BINS - 1) update = +1;
+        }
+
+        last_bin = current_bin;
+    }
+
+    return update;
+}
+
 // --------------------------- Main ---------------------------
 
-#define N_BINS 8
-#define EXTEND_THRESHOLD 0.8f
-#define RETRACT_THRESHOLD 0.6f
 
 int main() {
     stdio_init_all();
@@ -76,46 +126,23 @@ int main() {
 
     joystick_init(JOY_X_PIN, JOY_Y_PIN);
 
+    gpio_init(BUZZER_PIN);
+    gpio_set_dir(BUZZER_PIN, true);
+
     ssd1306_clear(&disp);
     draw_board(&disp, scale, n_lines);
 
     init_histogram(n_lines + 1);
 
     repeating_timer_t timer;
-    add_repeating_timer_ms(200, simulation_tick_callback, NULL, &timer);
+    add_repeating_timer_ms(100, simulation_tick_callback, NULL, &timer);
 
-    float r, teta;
-    bool extended = false;
-    int current_bin = -1, last_bin = -1;
-    int valor = 0;
 
     while (true) {
-        joystick_get_RA(&r, &teta);
+        int update = update_joystick();
 
-        // Update extension state
-        if (r > EXTEND_THRESHOLD) {
-            extended = true;
-        } else if (r < RETRACT_THRESHOLD) {
-            extended = false;
-            last_bin = -1;
-        }
-
-        if (extended) {
-            if (teta < 0) teta += 2 * M_PI;
-
-            // Calculate bin index
-            current_bin = (int)(teta * N_BINS / (2 * M_PI)) % N_BINS;
-
-            if (last_bin != -1) {
-                int diff = (current_bin - last_bin + N_BINS) % N_BINS;
-
-                if (diff == 1) valor--;
-                else if (diff == N_BINS - 1) valor++;
-            }
-
-            last_bin = current_bin;
-
-            printf("valor: %d\n", valor);
+        if(update != 0) {
+            printf("update: %d\n", update);
         }
 
         sleep_ms(10);
