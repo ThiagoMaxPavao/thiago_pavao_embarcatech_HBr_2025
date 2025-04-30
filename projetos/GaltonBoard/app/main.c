@@ -85,6 +85,36 @@ bool simulation_tick_callback(repeating_timer_t *rt) {
     return true; // Keep the timer running
 }
 
+bool update_simulation_frequency(int update) {
+    static float current_simulation_frequency = 2;
+    bool changed = false;
+
+    if(update == 1) { // want higher frequency
+        if(current_simulation_frequency < MAX_SIMULATION_UPDATE_FREQUENCY) { // allowed to get higher
+            current_simulation_frequency *= 1.3;
+            changed = true;
+        }
+        else if(n_updates < 4) { 
+            n_updates++;          // higher number of updates in each simulation tick
+            changed = true;
+        }
+    }
+    else if(update == -1) { // want lower frequency
+        if(n_updates > 1) {
+            n_updates--;
+            changed = true;
+        }
+        else if(current_simulation_frequency > MIN_SIMULATION_UPDATE_FREQUENCY){
+            current_simulation_frequency *= 0.7;
+            changed = true;
+        }
+    }
+
+    simulation_delay_tick_us = 1000000.0 / current_simulation_frequency;
+
+    return changed;
+}
+
 // --------------------------- Joystick logic ---------------------------
 
 int64_t buzzer_off_callback(alarm_id_t id, void *user_data) {
@@ -117,11 +147,6 @@ int update_joystick() {
 
         if (last_bin != -1) {
             int diff = (current_bin - last_bin + JOYSTICK_N_BINS) % JOYSTICK_N_BINS;
-
-            if(diff != 0) {
-                gpio_put(BUZZER_PIN, true);
-                add_alarm_in_ms(2, buzzer_off_callback, NULL, false);
-            }
 
             if (diff == 1) update = -1;
             else if (diff == JOYSTICK_N_BINS - 1) update = +1;
@@ -157,32 +182,18 @@ int main() {
 
     absolute_time_t last_redraw_time = get_absolute_time();
 
-    float current_simulation_frequency = 2;
-
 
     while (true) {
         absolute_time_t now = get_absolute_time();
 
         int update = update_joystick();
 
-        if(update == 1) { // want higher frequency
-            if(current_simulation_frequency < MAX_SIMULATION_UPDATE_FREQUENCY) { // allowed to get higher
-                current_simulation_frequency *= 1.3;
-            }
-            else if(n_updates < 4) { 
-                n_updates++;          // higher number of updates in each simulation tick
-            }
-        }
-        else if(update == -1) { // want lower frequency
-            if(n_updates > 1) {
-                n_updates--;
-            }
-            else if(current_simulation_frequency > MIN_SIMULATION_UPDATE_FREQUENCY){
-                current_simulation_frequency *= 0.7;
-            }
-        }
+        bool frequency_changed = update_simulation_frequency(update);
 
-        simulation_delay_tick_us = 1000000.0 / current_simulation_frequency;
+        if(frequency_changed) { // ring buzzer
+            gpio_put(BUZZER_PIN, true);
+            add_alarm_in_ms(2, buzzer_off_callback, NULL, false);
+        }
 
         if(redraw && absolute_time_diff_us(last_redraw_time, now) > 1000000.0 / MAX_FPS) {
             redraw = false;
