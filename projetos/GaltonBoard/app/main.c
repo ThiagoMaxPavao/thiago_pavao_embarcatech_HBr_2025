@@ -17,7 +17,7 @@
 
 #define MAX_FPS 60
 
-#define MAX_SIMULATION_UPDATE_FREQUENCY MAX_FPS/2
+#define MAX_SIMULATION_UPDATE_FREQUENCY MAX_FPS*0.7
 #define MIN_SIMULATION_UPDATE_FREQUENCY 1
 
 // --------------------------- Pinagem ---------------------------
@@ -56,8 +56,8 @@ void draw_board(ssd1306_t *disp, int scale, int n_lines) {
 
 ssd1306_t disp;
 volatile bool redraw = false;
-int scale = 4;
-int n_lines = 7;
+int scale = 1;
+int n_lines = 31;
 int n_updates = 1;
 
 int64_t simulation_delay_tick_us = 1<<19;
@@ -165,11 +165,21 @@ int main() {
 
         int update = update_joystick();
 
-        if(update == 1 && current_simulation_frequency < MAX_SIMULATION_UPDATE_FREQUENCY) {
-            current_simulation_frequency *= 1.3;
+        if(update == 1) { // want higher frequency
+            if(current_simulation_frequency < MAX_SIMULATION_UPDATE_FREQUENCY) { // allowed to get higher
+                current_simulation_frequency *= 1.3;
+            }
+            else if(n_updates < 4) { 
+                n_updates++;          // higher number of updates in each simulation tick
+            }
         }
-        else if(update == -1 && current_simulation_frequency > MIN_SIMULATION_UPDATE_FREQUENCY) {
-            current_simulation_frequency *= 0.7;
+        else if(update == -1) { // want lower frequency
+            if(n_updates > 1) {
+                n_updates--;
+            }
+            else if(current_simulation_frequency > MIN_SIMULATION_UPDATE_FREQUENCY){
+                current_simulation_frequency *= 0.7;
+            }
         }
 
         simulation_delay_tick_us = 1000000.0 / current_simulation_frequency;
