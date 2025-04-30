@@ -8,7 +8,7 @@
 
 // --------------------------- Configuração ---------------------------
 
-#define JOYSTICK_N_BINS 16
+#define JOYSTICK_N_BINS 10
 #define JOYSTICK_EXTEND_THRESHOLD 0.9f
 #define JOYSTICK_RETRACT_THRESHOLD 0.8f
 
@@ -73,11 +73,16 @@ bool simulation_tick_callback(repeating_timer_t *rt) {
 
 // --------------------------- Joystick logic ---------------------------
 
-float r, teta;
-bool extended = false;
-int current_bin = -1, last_bin = -1;
+int64_t buzzer_off_callback(alarm_id_t id, void *user_data) {
+    gpio_put(BUZZER_PIN, false);
+    return 0; // one-shot
+}
 
 int update_joystick() {
+    static bool extended = false;
+    static int current_bin = -1, last_bin = -1;
+
+    float r, teta;
     int update = 0;
 
     joystick_get_RA(&r, &teta);
@@ -101,8 +106,7 @@ int update_joystick() {
 
             if(diff != 0) {
                 gpio_put(BUZZER_PIN, true);
-                sleep_ms(10);
-                gpio_put(BUZZER_PIN, false);
+                add_alarm_in_ms(2, buzzer_off_callback, NULL, false);
             }
 
             if (diff == 1) update = -1;
