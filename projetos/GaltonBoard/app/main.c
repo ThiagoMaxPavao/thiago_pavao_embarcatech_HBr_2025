@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdint.h>
+#include <inttypes.h>
+
 #include "pico/stdlib.h"
 #include "ssd1306.h"
 #include "joystick.h"
@@ -13,6 +16,9 @@
 #define JOYSTICK_RETRACT_THRESHOLD 0.8f
 
 #define MAX_FPS 60
+
+#define MAX_SIMULATION_UPDATE_FREQUENCY MAX_FPS/2
+#define MIN_SIMULATION_UPDATE_FREQUENCY 1
 
 // --------------------------- Pinagem ---------------------------
 
@@ -54,6 +60,8 @@ int scale = 4;
 int n_lines = 7;
 int n_updates = 1;
 
+int64_t simulation_delay_tick_us = 1<<19;
+
 bool simulation_tick_callback(repeating_timer_t *rt) {
     clear_balls(&disp, scale);
 
@@ -70,6 +78,9 @@ bool simulation_tick_callback(repeating_timer_t *rt) {
 
     // update display
     redraw = true;
+
+    // update time
+    rt->delay_us = simulation_delay_tick_us;
 
     return true; // Keep the timer running
 }
@@ -142,15 +153,26 @@ int main() {
     init_histogram(n_lines + 1);
 
     repeating_timer_t timer;
-    add_repeating_timer_ms(100, simulation_tick_callback, NULL, &timer);
+    add_repeating_timer_ms(1000, simulation_tick_callback, NULL, &timer);
 
     absolute_time_t last_redraw_time = get_absolute_time();
+
+    float current_simulation_frequency = 2;
 
 
     while (true) {
         absolute_time_t now = get_absolute_time();
 
         int update = update_joystick();
+
+        if(update == 1 && current_simulation_frequency < MAX_SIMULATION_UPDATE_FREQUENCY) {
+            current_simulation_frequency *= 1.3;
+        }
+        else if(update == -1 && current_simulation_frequency > MIN_SIMULATION_UPDATE_FREQUENCY) {
+            current_simulation_frequency *= 0.7;
+        }
+
+        simulation_delay_tick_us = 1000000.0 / current_simulation_frequency;
 
         if(redraw && absolute_time_diff_us(last_redraw_time, now) > 1000000.0 / MAX_FPS) {
             redraw = false;
