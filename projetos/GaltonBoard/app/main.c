@@ -12,6 +12,8 @@
 #define JOYSTICK_EXTEND_THRESHOLD 0.9f
 #define JOYSTICK_RETRACT_THRESHOLD 0.8f
 
+#define MAX_FPS 60
+
 // --------------------------- Pinagem ---------------------------
 
 // I2C display OLED
@@ -47,6 +49,7 @@ void draw_board(ssd1306_t *disp, int scale, int n_lines) {
 // --------------------------- Simulation Tick Callback ---------------------------
 
 ssd1306_t disp;
+volatile bool redraw = false;
 int scale = 4;
 int n_lines = 7;
 int n_updates = 1;
@@ -66,7 +69,7 @@ bool simulation_tick_callback(repeating_timer_t *rt) {
     draw_histogram(&disp);
 
     // update display
-    ssd1306_show(&disp);
+    redraw = true;
 
     return true; // Keep the timer running
 }
@@ -141,14 +144,20 @@ int main() {
     repeating_timer_t timer;
     add_repeating_timer_ms(100, simulation_tick_callback, NULL, &timer);
 
+    absolute_time_t last_redraw_time = get_absolute_time();
+
 
     while (true) {
+        absolute_time_t now = get_absolute_time();
+
         int update = update_joystick();
 
-        if(update != 0) {
-            printf("update: %d\n", update);
+        if(redraw && absolute_time_diff_us(last_redraw_time, now) > 1000000.0 / MAX_FPS) {
+            redraw = false;
+            last_redraw_time = now;
+            ssd1306_show(&disp);
         }
 
-        sleep_ms(10);
+        sleep_ms(5);
     }
 }
