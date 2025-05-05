@@ -49,7 +49,7 @@ int update_balls(int n_lines) {
     static int start_occupied_tick_count = 0;
     int exit_position = -1;
 
-    if(balls_falling[0].x >= 2*n_lines) {
+    if(ball_falling_count > 0 && balls_falling[0].x >= 2*n_lines) {
         ball_queued_count++;
         ball_falling_count--;
         exit_position = (balls_falling[0].y + n_lines)/2;
@@ -89,4 +89,9 @@ int update_balls(int n_lines) {
     }
 
     return exit_position;
+}
+
+void reset_balls() {
+    ball_falling_count = 0;
+    ball_queued_count = MAX_BALLS;
 }

@@ -15,5 +15,6 @@ typedef struct {
 void draw_balls(ssd1306_t *disp, int scale);
 void clear_balls(ssd1306_t *disp, int scale);
 int update_balls(int n_lines);
+void reset_balls();
 
 #endif

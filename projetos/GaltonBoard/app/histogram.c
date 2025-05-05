@@ -8,8 +8,9 @@ void init_histogram(int _n_bins) {
     for (int i = 0; i < MAX_BINS; i++) {
         histogram_values[i] = 0;
     }
-
+    
     n_bins = _n_bins;
+    max_value = 0;
 }
 
 void add_to_histogram(int value) {

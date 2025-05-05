@@ -5,6 +5,7 @@
 #include "pico/stdlib.h"
 #include "ssd1306.h"
 #include "joystick.h"
+#include "buttons.h"
 
 #include "ball.h"
 #include "histogram.h"
@@ -34,6 +35,11 @@
 // Buzzer
 #define BUZZER_PIN 21
 
+// Buttons
+#define BUTTON_A 5
+#define BUTTON_B 6
+#define BUTTON_JOYSTICK 22
+
 // --------------------------- Display OLED ---------------------------
 
 void draw_board(ssd1306_t *disp, int scale, int n_lines) {
@@ -56,34 +62,11 @@ void draw_board(ssd1306_t *disp, int scale, int n_lines) {
 
 ssd1306_t disp;
 volatile bool redraw = false;
-int scale = 1;
-int n_lines = 31;
+int scale = 4;
+int n_lines = 7;
 int n_updates = 1;
 
 int64_t simulation_delay_tick_us = 1<<19;
-
-bool simulation_tick_callback(repeating_timer_t *rt) {
-    clear_balls(&disp, scale);
-
-    for (int i = 0; i < n_updates; i++) {
-        int exit_position = update_balls(n_lines); // from 0 to n_lines, n_lines + 1 options
-
-        if (exit_position != -1) {
-            add_to_histogram(exit_position);
-        }
-    }
-
-    draw_balls(&disp, scale);
-    draw_histogram(&disp);
-
-    // update display
-    redraw = true;
-
-    // update time
-    rt->delay_us = simulation_delay_tick_us;
-
-    return true; // Keep the timer running
-}
 
 bool update_simulation_frequency(int update) {
     static float current_simulation_frequency = 2;
@@ -122,37 +105,42 @@ int64_t buzzer_off_callback(alarm_id_t id, void *user_data) {
     return 0; // one-shot
 }
 
-int update_joystick() {
+int update_joystick(absolute_time_t now) {
     static bool extended = false;
     static int current_bin = -1, last_bin = -1;
+    static absolute_time_t last_read_time = 0;
 
     float r, teta;
     int update = 0;
 
-    joystick_get_RA(&r, &teta);
+    if(absolute_time_diff_us(last_read_time, now) > 10000) {
+        last_read_time = now;
 
-    // Update extension state
-    if (r > JOYSTICK_EXTEND_THRESHOLD) {
-        extended = true;
-    } else if (r < JOYSTICK_RETRACT_THRESHOLD) {
-        extended = false;
-        last_bin = -1;
-    }
+        joystick_get_RA(&r, &teta);
 
-    if (extended) {
-        if (teta < 0) teta += 2 * M_PI;
-
-        // Calculate bin index
-        current_bin = (int)(teta * JOYSTICK_N_BINS / (2 * M_PI)) % JOYSTICK_N_BINS;
-
-        if (last_bin != -1) {
-            int diff = (current_bin - last_bin + JOYSTICK_N_BINS) % JOYSTICK_N_BINS;
-
-            if (diff == 1) update = -1;
-            else if (diff == JOYSTICK_N_BINS - 1) update = +1;
+        // Update extension state
+        if (r > JOYSTICK_EXTEND_THRESHOLD) {
+            extended = true;
+        } else if (r < JOYSTICK_RETRACT_THRESHOLD) {
+            extended = false;
+            last_bin = -1;
         }
-
-        last_bin = current_bin;
+    
+        if (extended) {
+            if (teta < 0) teta += 2 * M_PI;
+    
+            // Calculate bin index
+            current_bin = (int)(teta * JOYSTICK_N_BINS / (2 * M_PI)) % JOYSTICK_N_BINS;
+    
+            if (last_bin != -1) {
+                int diff = (current_bin - last_bin + JOYSTICK_N_BINS) % JOYSTICK_N_BINS;
+    
+                if (diff == 1) update = -1;
+                else if (diff == JOYSTICK_N_BINS - 1) update = +1;
+            }
+    
+            last_bin = current_bin;
+        }
     }
 
     return update;
@@ -160,6 +148,48 @@ int update_joystick() {
 
 // --------------------------- Main ---------------------------
 
+volatile bool do_reset_simulation = false;
+
+void set_scale_and_n_lines(int new_scale) {
+    scale = new_scale;
+    
+    switch(scale)
+    {
+    case 4:
+        n_lines = 7;
+        break;
+    case 2:
+        n_lines = 15;
+        break;
+    case 1:
+        n_lines = 31;
+        break;
+    default:
+        break;
+    }
+}
+
+void scale_down() {
+    if(scale == 4) {
+        set_scale_and_n_lines(2);
+    }
+    else if(scale == 2) {
+        set_scale_and_n_lines(1);
+    }
+
+    do_reset_simulation = true;
+}
+
+void scale_up() {
+    if(scale == 2) {
+        set_scale_and_n_lines(4);
+    }
+    else if(scale == 1) {
+        set_scale_and_n_lines(2);
+    }
+
+    do_reset_simulation = true;
+}
 
 int main() {
     stdio_init_all();
@@ -175,18 +205,21 @@ int main() {
     ssd1306_clear(&disp);
     draw_board(&disp, scale, n_lines);
 
+    buttons_init(BUTTON_A, BUTTON_B, BUTTON_JOYSTICK);
+
+    set_button_A_callback(scale_down);
+    set_button_B_callback(scale_up);
+
     init_histogram(n_lines + 1);
 
-    repeating_timer_t timer;
-    add_repeating_timer_ms(1000, simulation_tick_callback, NULL, &timer);
 
     absolute_time_t last_redraw_time = get_absolute_time();
-
+    absolute_time_t last_simulation_tick_time = get_absolute_time();
 
     while (true) {
         absolute_time_t now = get_absolute_time();
 
-        int update = update_joystick();
+        int update = update_joystick(now);
 
         bool frequency_changed = update_simulation_frequency(update);
 
@@ -198,9 +231,40 @@ int main() {
         if(redraw && absolute_time_diff_us(last_redraw_time, now) > 1000000.0 / MAX_FPS) {
             redraw = false;
             last_redraw_time = now;
+
+            draw_balls(&disp, scale);
+            draw_histogram(&disp);
             ssd1306_show(&disp);
+            clear_balls(&disp, scale);
         }
 
-        sleep_ms(5);
+        if(absolute_time_diff_us(last_simulation_tick_time, now) > simulation_delay_tick_us) {
+            last_simulation_tick_time = now;
+
+            for (int i = 0; i < n_updates; i++) {
+                int exit_position = update_balls(n_lines); // from 0 to n_lines, n_lines + 1 options
+
+                if (exit_position != -1) {
+                    add_to_histogram(exit_position);
+                }
+            }
+
+            // update display
+            redraw = true;
+        }
+
+        if(do_reset_simulation) {
+            do_reset_simulation = false;
+
+            reset_balls();
+            init_histogram(n_lines + 1);
+
+            ssd1306_clear(&disp);
+            draw_board(&disp, scale, n_lines);
+
+            // update display
+            redraw = true;
+        }
+
     }
 }
