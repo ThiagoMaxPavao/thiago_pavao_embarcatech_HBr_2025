@@ -14,7 +14,6 @@ static int n_lines = INITIAL_N_LINES;
 
 // simulation tick parameters
 
-static int n_updates = 1;
 int64_t simulation_delay_tick_us = INITIAL_SIMULATION_TICK_US;
 
 // notify
@@ -119,7 +118,7 @@ void draw_board(ssd1306_t *disp) {
 // --------------------------- Simulation Tick Callback ---------------------------
 
 bool update_simulation_frequency(int update) {
-    static float current_simulation_frequency = 2;
+    static float current_simulation_frequency = INITIAL_SIMULATION_UPDATE_FREQUENCY;
     bool changed = false;
 
     if(update == 1) { // want higher frequency
@@ -127,17 +126,9 @@ bool update_simulation_frequency(int update) {
             current_simulation_frequency *= 1.3;
             changed = true;
         }
-        else if(n_updates < 4) { 
-            n_updates++;          // higher number of updates in each simulation tick
-            changed = true;
-        }
     }
     else if(update == -1) { // want lower frequency
-        if(n_updates > 1) {
-            n_updates--;
-            changed = true;
-        }
-        else if(current_simulation_frequency > MIN_SIMULATION_UPDATE_FREQUENCY){
+        if(current_simulation_frequency > MIN_SIMULATION_UPDATE_FREQUENCY){
             current_simulation_frequency *= 0.7;
             changed = true;
         }
@@ -149,12 +140,10 @@ bool update_simulation_frequency(int update) {
 }
 
 void run_simulation_tick() {
-    for (int i = 0; i < n_updates; i++) {
-        int exit_position = update_balls(n_lines); // from 0 to n_lines, n_lines + 1 options
+    int exit_position = update_balls(n_lines); // from 0 to n_lines, n_lines + 1 options
 
-        if (exit_position != -1) {
-            add_to_histogram(exit_position);
-        }
+    if (exit_position != -1) {
+        add_to_histogram(exit_position);
     }
 }
 
