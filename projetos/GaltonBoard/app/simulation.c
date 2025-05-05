@@ -20,6 +20,7 @@ int64_t simulation_delay_tick_us = INITIAL_SIMULATION_TICK_US;
 // notify
 
 extern volatile bool redraw;
+extern volatile bool redraw_board;
 
 // --------------------------- Display OLED ---------------------------
 
@@ -187,6 +188,7 @@ void scale_down() {
 
     reset_balls();
     init_histogram(n_lines + 1);
+    redraw_board = true;
     redraw = true;
 }
 
@@ -200,5 +202,6 @@ void scale_up() {
 
     reset_balls();
     init_histogram(n_lines + 1);
+    redraw_board = true;
     redraw = true;
 }

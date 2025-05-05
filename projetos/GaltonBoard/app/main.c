@@ -17,6 +17,7 @@
 
 ssd1306_t disp;
 volatile bool redraw = false;
+volatile bool redraw_board = false;
 extern int64_t simulation_delay_tick_us;
 
 
@@ -62,6 +63,12 @@ int main() {
         if(redraw && absolute_time_diff_us(last_redraw_time, now) > 1000000.0 / MAX_FPS) {
             redraw = false;
             last_redraw_time = now;
+            
+            if(redraw_board) {
+                redraw_board = false;
+                ssd1306_clear(&disp);
+                draw_board(&disp);
+            }
 
             draw_balls(&disp);
             draw_histogram(&disp);
