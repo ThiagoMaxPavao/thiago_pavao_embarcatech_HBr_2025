@@ -123,13 +123,13 @@ bool update_simulation_frequency(int update) {
 
     if(update == 1) { // want higher frequency
         if(current_simulation_frequency < MAX_SIMULATION_UPDATE_FREQUENCY) { // allowed to get higher
-            current_simulation_frequency *= 1.3;
+            current_simulation_frequency *= 1.7;
             changed = true;
         }
     }
     else if(update == -1) { // want lower frequency
         if(current_simulation_frequency > MIN_SIMULATION_UPDATE_FREQUENCY){
-            current_simulation_frequency *= 0.7;
+            current_simulation_frequency /= 1.7;
             changed = true;
         }
     }

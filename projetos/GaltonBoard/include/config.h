@@ -3,7 +3,7 @@
 
 // --------------------------- Configuração ---------------------------
 
-#define JOYSTICK_N_BINS 10
+#define JOYSTICK_N_BINS 8
 #define JOYSTICK_EXTEND_THRESHOLD 0.9f
 #define JOYSTICK_RETRACT_THRESHOLD 0.8f
 
