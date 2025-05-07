@@ -47,6 +47,24 @@ void clear_balls(ssd1306_t *disp) {
     }
 }
 
+void draw_board(ssd1306_t *disp) {
+    int x_offset = scale;
+    int y_offset = (disp->height - scale)/2;
+
+    for(int line = 0; line < n_lines; line++) {
+        int n_pins = line + 1;
+        for(int column = 0; column < n_pins; column++) {
+            int x = x_offset + 2*scale*line;
+            int y = y_offset - scale*line + 2*scale*column;
+            ssd1306_draw_square(disp, x, y, scale, scale);
+        }
+        n_pins++;
+    }
+    ssd1306_show(disp);
+}
+
+// --------------------------- Ball Update logic ---------------------------
+
 int update_balls() {
     static bool start_occupied = false;
     static int start_occupied_tick_count = 0;
@@ -99,23 +117,19 @@ void reset_balls() {
     ball_queued_count = MAX_BALLS;
 }
 
-void draw_board(ssd1306_t *disp) {
-    int x_offset = scale;
-    int y_offset = (disp->height - scale)/2;
+// --------------------------- Simulation Tick Callback ---------------------------
 
-    for(int line = 0; line < n_lines; line++) {
-        int n_pins = line + 1;
-        for(int column = 0; column < n_pins; column++) {
-            int x = x_offset + 2*scale*line;
-            int y = y_offset - scale*line + 2*scale*column;
-            ssd1306_draw_square(disp, x, y, scale, scale);
-        }
-        n_pins++;
+void run_simulation_tick() {
+    // Atualiza posição das bolas no tabuleiro
+    int exit_position = update_balls(n_lines);
+
+    // Atualiza histograma se alguma bola tiver saído do tabuleiro
+    if (exit_position != -1) {
+        add_to_histogram(exit_position);
     }
-    ssd1306_show(disp);
 }
 
-// --------------------------- Simulation Tick Callback ---------------------------
+// --------------------------- Update Simulation Frequency Logic ---------------------------
 
 bool update_simulation_frequency(int update) {
     static float current_simulation_frequency = INITIAL_SIMULATION_UPDATE_FREQUENCY;
@@ -137,14 +151,6 @@ bool update_simulation_frequency(int update) {
     simulation_delay_tick_us = 1000000.0 / current_simulation_frequency;
 
     return changed;
-}
-
-void run_simulation_tick() {
-    int exit_position = update_balls(n_lines); // from 0 to n_lines, n_lines + 1 options
-
-    if (exit_position != -1) {
-        add_to_histogram(exit_position);
-    }
 }
 
 // --------------------------- Scale update ---------------------------

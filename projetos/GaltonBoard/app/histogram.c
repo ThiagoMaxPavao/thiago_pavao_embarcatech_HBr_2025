@@ -35,11 +35,13 @@ void draw_histogram(ssd1306_t *disp) {
         return;
     }
 
+    // desenha histograma
     for(int i = 0; i < n_bins; i++) {
         int bar_height = (histogram_values[i] * 64) / max_value;
         ssd1306_draw_square(disp, 64, 64*i/n_bins, bar_height, 64/n_bins);
     }
     
+    // desenha contagem total de bolas
     char buffer[16];
     int len = snprintf(buffer, sizeof(buffer), "%d", total_balls);
     ssd1306_clear_square(disp, 0, 64-8-1, 6*len, 8);

@@ -24,6 +24,7 @@ extern int64_t simulation_delay_tick_us;
 // --------------------------- Main ---------------------------
 
 int main() {
+    // Inicializa periféricos
     stdio_init_all();
 
     disp.external_vcc = false;
@@ -39,27 +40,31 @@ int main() {
 
     buttons_init(BUTTON_A, BUTTON_B, BUTTON_JOYSTICK);
 
+    // Configura as funções dos botões
     set_button_A_callback(scale_up);
     set_button_B_callback(scale_down);
 
+    // Inicializa o histograma
     init_histogram(INITIAL_N_LINES + 1);
 
-
+    // Tempos auxiliares de desenho e simulação
     absolute_time_t last_redraw_time = get_absolute_time();
     absolute_time_t last_simulation_tick_time = get_absolute_time();
 
     while (true) {
         absolute_time_t now = get_absolute_time();
 
+        // Verifica posição do joystick e atualiza frequência da simulação de acordo
         int update = update_joystick(now);
 
         bool frequency_changed = update_simulation_frequency(update);
 
-        if(frequency_changed) { // ring buzzer
+        if(frequency_changed) { // ring buzzer se a frequência tiver sido alterada
             gpio_put(BUZZER_PIN, true);
             add_alarm_in_ms(2, buzzer_off_alarm_callback, NULL, false);
         }
 
+        // Atualiza a tela no máximo a uma frequência de MAX_FPS
         if(redraw && absolute_time_diff_us(last_redraw_time, now) > 1000000.0 / MAX_FPS) {
             redraw = false;
             last_redraw_time = now;
@@ -76,6 +81,7 @@ int main() {
             clear_balls(&disp);
         }
 
+        // Executa um tick da simulação na frequência atual
         if(absolute_time_diff_us(last_simulation_tick_time, now) > simulation_delay_tick_us) {
             last_simulation_tick_time = now;
 

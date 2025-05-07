@@ -20,11 +20,6 @@ int get_random_direction(int chance) {
 
 // --------------------------- Joystick logic ---------------------------
 
-int64_t buzzer_off_alarm_callback(alarm_id_t id, void *user_data) {
-    gpio_put(BUZZER_PIN, false);
-    return 0; // one-shot
-}
-
 int update_joystick(absolute_time_t now) {
     static bool extended = false;
     static int current_bin = -1, last_bin = -1;
@@ -64,4 +59,11 @@ int update_joystick(absolute_time_t now) {
     }
 
     return update;
+}
+
+// --------------------------- Buzzer off alarm ---------------------------
+
+int64_t buzzer_off_alarm_callback(alarm_id_t id, void *user_data) {
+    gpio_put(BUZZER_PIN, false);
+    return 0; // one-shot
 }
