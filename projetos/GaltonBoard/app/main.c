@@ -39,8 +39,8 @@ int main() {
 
     buttons_init(BUTTON_A, BUTTON_B, BUTTON_JOYSTICK);
 
-    set_button_A_callback(scale_down);
-    set_button_B_callback(scale_up);
+    set_button_A_callback(scale_up);
+    set_button_B_callback(scale_down);
 
     init_histogram(INITIAL_N_LINES + 1);
 
