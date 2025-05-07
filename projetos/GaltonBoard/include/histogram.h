@@ -1,6 +1,7 @@
 #ifndef _histogram
 #define _histogram
 
+#include <stdio.h>
 #include "ssd1306.h"
 
 #define MAX_BINS 33
