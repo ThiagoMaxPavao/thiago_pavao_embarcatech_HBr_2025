@@ -44,7 +44,13 @@ Para interagir:
 
 ## 🖼️ Imagens e Vídeos
 
-...
+- **Histograma após um grande número de bolinhas**:
+
+![Muitas bolinhas](assets/muitas_bolinhas.jpg)
+
+[Vídeo exibindo o funcionamento do joystick para alteração da velocidade da simulação](https://youtu.be/TKupzQnc6cE).
+
+[Vídeo exibindo a troca de escala e de número de linhas com os botões](https://youtu.be/TtTd8fhyT2E)
 
 ## 🛠️ Desenvolvimento
 
